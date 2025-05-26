@@ -1,0 +1,149 @@
+﻿<Window x:Class="RTL_POS_WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RTL_POS_WPF"
+        mc:Ignorable="d" 
+        Title="Restaurant POS" Height="600" Width="900"
+        FlowDirection="RightToLeft" WindowState="Maximized" Icon="Resources/logo_pos.png">
+    <Window.Resources>
+        <!--<ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Styles-DarkModern.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>-->
+    </Window.Resources>
+    <DockPanel Background="{DynamicResource AppBackgroundBrush}">
+        <!-- Menu Bar -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="New Order" />
+                <MenuItem Header="Exit" />
+            </MenuItem>
+            <MenuItem Header="Tables" />
+            <MenuItem Header="Orders" />
+            <MenuItem Header="Billing" />
+            <MenuItem Header="Settings" />
+            <MenuItem Header="Themes">
+                <MenuItem Header="Dark" Click="ThemeDark_Click"/>
+                <MenuItem Header="Blue" Click="ThemeBlue_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Dynamic Customers Panel -->
+        <ScrollViewer DockPanel.Dock="Top" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,5">
+            <ItemsControl x:Name="CustomersPanel" Margin="10,5,10,5">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+        <!-- Main Content Area -->
+        <Grid Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="75*" />
+                <ColumnDefinition Width="135*"/>
+                <ColumnDefinition Width="352*" />
+                <ColumnDefinition Width="280*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="7*" />
+                <RowDefinition Height="2*" />
+            </Grid.RowDefinitions>
+
+            <!-- Category Panel (Right) -->
+            <GroupBox Header="Categories" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="5,5,5,5">
+                <ItemsControl x:Name="CategoryListBox">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ListBoxItem Content="Burgers" />
+                    <ListBoxItem Content="Pizzas" />
+                    <ListBoxItem Content="Drinks" />
+                </ItemsControl>
+            </GroupBox>
+
+            <!-- Product Panel (Center) -->
+            <GroupBox Header="Products" Grid.Column="2" Grid.Row="0" Margin="5,5,5,5">
+                <ItemsControl x:Name="ProductItemsControl">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <Button Content="Cheeseburger" />
+                    <Button Content="Veggie Pizza" />
+                    <Button Content="Cola" />
+                </ItemsControl>
+            </GroupBox>
+
+            <!-- Order Grid (Left) -->
+            <GroupBox Header="Order" Grid.Column="3" Grid.Row="0" Margin="5,5,5,5">
+                <DataGrid x:Name="OrderDataGrid" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" >
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Product" Binding="{Binding Name}" Width="*" />
+                        <DataGridTemplateColumn Header="Qty" Width="80">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding Quantity}" Width="24" 
+                                                   VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Foreground="Black" FontWeight="Bold"/>
+                                        <Button Content="+" Width="24" Height="24" Margin="2,0,2,0"
+                                                Click="IncreaseQuantity_Click" Tag="{Binding}" />
+                                        <Button Content="−" Width="24" Height="24" Margin="2,0,2,0"
+                                                Click="DecreaseQuantity_Click" Tag="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="Modifiers" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Modifiers, TargetNullValue='Add modifier'}"
+                                               TextDecorations="Underline" Cursor="Hand" ToolTip="Click to add or edit modifier"
+                                               MouseLeftButtonUp="ModifierTextBlock_MouseLeftButtonUp"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header=" " Width="45">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="X" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+            <!-- Order Summary and Payment (Bottom Left) -->
+            <StackPanel Grid.Column="0" Grid.Row="1" Margin="5,5,5,5" Grid.ColumnSpan="3" Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <TextBlock Text="Total:" FontWeight="Bold" FontSize="22" Foreground="White"/>
+                    <TextBlock x:Name="TotalTextBlock" Text="$0.00" FontSize="20" Margin="0,0,0,10" Foreground="White"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="5">
+                    <ItemsControl x:Name="PaymentOptionsPanel">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </StackPanel>
+
+            <StatusBar Grid.Column="3" Grid.Row="1" DockPanel.Dock="Bottom" Background="Transparent" Foreground="White" Height="32">
+                <StatusBarItem HorizontalAlignment="Right" Width="Auto">
+                    <TextBlock x:Name="CurrentTimeTextBlock" Text="Time" FontSize="16" FontWeight="Bold"/>
+                </StatusBarItem>
+            </StatusBar>
+        </Grid>
+    </DockPanel>
+</Window>
